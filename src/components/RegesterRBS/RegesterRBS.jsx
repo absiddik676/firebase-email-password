@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
-import { createUserWithEmailAndPassword, getAuth } from "firebase/auth";
+import { createUserWithEmailAndPassword, getAuth, sendEmailVerification } from "firebase/auth";
 import app from '../../firebase.config';
+import { Link } from 'react-router-dom';
 const RegesterRBS = () => {
    
     const [error,setError] = useState('')
@@ -30,11 +31,19 @@ const RegesterRBS = () => {
             setError('');
             e.target.reset();
             setSuccess('User has create successfully')
+            sendVerificationEmail(loggedUser)
         })
         .catch(error=>{
             setError(error.message);
         })
 
+    }
+
+    const sendVerificationEmail =  (user)=>{
+        sendEmailVerification(auth,user)
+        .then(result=>{
+            console.log(result);
+        })
     }
 
 
@@ -58,6 +67,7 @@ const RegesterRBS = () => {
                     Submit
                 </Button>
             </Form>
+            <small>Already have a account,</small><Link to="/login"> please login</Link>
             <p className='text-danger'>{error}</p>
             <p className='text-success'>{success}</p>
         </div>
