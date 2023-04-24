@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
-import { createUserWithEmailAndPassword, getAuth, sendEmailVerification } from "firebase/auth";
+import { createUserWithEmailAndPassword, getAuth, sendEmailVerification, updateCurrentUser, updateProfile } from "firebase/auth";
 import app from '../../firebase.config';
 import { Link } from 'react-router-dom';
 const RegesterRBS = () => {
@@ -15,6 +15,7 @@ const RegesterRBS = () => {
         e.preventDefault()
         const email = e.target.email.value;
         const password = e.target.password.value;
+        const name = e.target.name.value;
         if(!/(?=.*[A-Z])/.test(password)){
             setError('please add one upper case');
             return;
@@ -23,15 +24,15 @@ const RegesterRBS = () => {
             setError('Password must be 8 character');
             return
         }
-       
         createUserWithEmailAndPassword(auth,email,password)
         .then(result=>{
             const loggedUser = result.user
-            console.log(loggedUser);
             setError('');
             e.target.reset();
             setSuccess('User has create successfully')
             sendVerificationEmail(loggedUser)
+            updateUsers(name,loggedUser)
+            console.log(loggedUser);
         })
         .catch(error=>{
             setError(error.message);
@@ -39,12 +40,26 @@ const RegesterRBS = () => {
 
     }
 
-    const sendVerificationEmail =  (user)=>{
-        sendEmailVerification(auth,user)
+    const sendVerificationEmail = currentUser =>{
+        sendEmailVerification(auth,currentUser)
         .then(result=>{
+            alert('pleas vkj')
             console.log(result);
         })
     }
+    const updateUsers = (name,user)=>{
+        updateProfile(user,{
+            displayName:name
+        })
+        .then(()=>{
+            console.log('user updated');
+        })
+        .catch(error=>{
+            console.log('updated');
+        })
+    }
+
+    
 
 
     return (
@@ -52,13 +67,17 @@ const RegesterRBS = () => {
             <h4 className='text-primary'>Please Register</h4>
             <Form onSubmit={handelRegister}>
                 <Form.Group className="mb-3" controlId="formBasicEmail">
+                    <Form.Label>Name</Form.Label>
+                    <Form.Control name='name' type="text" placeholder="Enter Your Name" required/>
+                </Form.Group>
+                <Form.Group className="mb-3" controlId="formBasicEmail">
                     <Form.Label>Email address</Form.Label>
-                    <Form.Control name='email' type="email" placeholder="Enter email" required/>
+                    <Form.Control name='email' type="email" placeholder="Enter Your email" required/>
                 </Form.Group>
 
                 <Form.Group className="mb-3" controlId="formBasicPassword">
                     <Form.Label>Password</Form.Label>
-                    <Form.Control name='password' type="password" placeholder="Password" required />
+                    <Form.Control name='password' type="password" placeholder="Enter Your Password" required />
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="formBasicCheckbox">
                     <Form.Check type="checkbox" label="Accept Our Terms and condition" />
@@ -72,6 +91,6 @@ const RegesterRBS = () => {
             <p className='text-success'>{success}</p>
         </div>
     );
-};
+}
 
 export default RegesterRBS;

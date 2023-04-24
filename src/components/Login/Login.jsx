@@ -1,12 +1,15 @@
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
-import React, { useState } from 'react';
+import { getAuth, sendPasswordResetEmail, signInWithEmailAndPassword } from 'firebase/auth';
+import React, { useRef, useState } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import app from '../../firebase.config';
 import { Link } from 'react-router-dom';
 
 const Login = () => {
     const [error,setError] = useState('');
-    const [success,setSuccess] = useState('')
+    const [success,setSuccess] = useState('');
+    const emailRef = useRef();
+
+
     const auth = getAuth(app)
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -39,13 +42,26 @@ const Login = () => {
             setError(error.message)
         })
         console.log(email,password);
-      }
+    }
+
+    const handelResetPassword = ()=>{
+        const email = emailRef.current.value;
+        sendPasswordResetEmail(auth , email)
+        .then(()=>{
+            alert('cheack your email')
+        })
+        .catch(error=>{
+            console.log(error);
+        })
+        
+    }
+
     return (
         <div className='w-50 mt-5 mx-auto'>
             <Form onSubmit={handleSubmit}>
                 <Form.Group controlId="formBasicEmail">
                     <Form.Label>Email address</Form.Label>
-                    <Form.Control required type="email" name='email' placeholder="Enter email"   />
+                    <Form.Control ref={emailRef} required type="email" name='email' placeholder="Enter email"   />
                 </Form.Group>
 
                 <Form.Group controlId="formBasicPassword">
@@ -57,7 +73,9 @@ const Login = () => {
                     Submit
                 </Button>
             </Form>
+
             <small>New to this website, </small><Link to="/registerRBS">please register</Link>
+            <small> Forgot password? <Link onClick={handelResetPassword}>Reset</Link></small>
             <p className='text-danger'>{error}</p>
             <p className='text-success'>{success}</p>
         </div>
