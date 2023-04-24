@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 const Login = () => {
     const [error,setError] = useState('');
     const [success,setSuccess] = useState('');
+    const [show,setShow] = useState(false);
     const emailRef = useRef();
 
 
@@ -56,6 +57,10 @@ const Login = () => {
         
     }
 
+    const handelShowPassword = ()=>{
+        setShow(!show)
+    }
+
     return (
         <div className='w-50 mt-5 mx-auto'>
             <Form onSubmit={handleSubmit}>
@@ -66,7 +71,8 @@ const Login = () => {
 
                 <Form.Group controlId="formBasicPassword">
                     <Form.Label>Password</Form.Label>
-                    <Form.Control required type="password" name='password' placeholder="Password"  />
+                    <Form.Control required type={show ? 'text' : 'password'} name='password' placeholder="Password"  />
+                    <small onClick={handelShowPassword}>Show Password</small>
                 </Form.Group>
 
                 <Button variant="primary" type="submit">
